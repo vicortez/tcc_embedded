@@ -1,0 +1,86 @@
+import custom_classifier
+import numpy as np
+
+
+# functions ===================================================================
+def predict_next_position(pointpositionhistory):
+    numofpos=len(pointpositionhistory)
+    if numofpos == 1:
+        predicted_next_position=1
+    return predicted_next_position
+
+def point_existed(p,points_history):
+    #se distancia entre ponto e algum dos elementos de lasthull.predict for menor que 10, True
+    distlist=[]
+    if len(points_history)==0:
+        return False
+    for el in points_history:
+        distlist.append(np.linalg.norm(np.subtract(p,el[len(el)-1])))
+    minval=min(distlist)
+    if minval > 40:
+        return False
+    else:
+        return True
+    
+def get_point_pos(p,points_history):
+    #se distancia entre ponto e algum dos elementos de lasthull.predict for menor que 10, True
+    distlist=[]
+    for el in points_history:
+        distlist.append(np.linalg.norm(np.subtract(p,el[len(el)-1])))
+    minpos=distlist.index(min(distlist))
+    return minpos
+
+def point_crossed_line(points_history,line,car_orientation):
+    if len(points_history) <= 1:
+        return (False,(0,0),(0,0))
+    up=False
+    down=False
+    if car_orientation == 'vertical':
+        for point_history in points_history:
+            up=False
+            down=False
+            for point in point_history:
+                if point[1] > line[0][1]:
+                    up=True
+                else:
+                    down=True
+                if up and down:
+                    #points_history.remove(point_history)
+                    return (True, point,point_history)
+    elif car_orientation == 'horizontal':
+        print (line[0][0])
+        for point_history in points_history:
+            left=False
+            right=False
+            for point in point_history:
+                print(point)
+                if point[1] > line[0][1]:
+                    left=True
+                else:
+                    right=True
+                if left and right:
+                    #points_history.remove(point_history)
+                    return (True, point,point_history)
+    return (False,(0,0),(0,0))
+
+def classify_point(point,rectangles,frame):
+    print( len(rectangles))
+    distlist=[];
+    for rect in rectangles:
+        xret=rect[0]+rect[2]/2
+        yret=rect[1]+rect[3]/2
+        distlist.append(np.linalg.norm(np.subtract(point,(xret,yret))))
+    minpos=distlist.index(min(distlist))
+    x1=rectangles[minpos][0]
+    x2=rectangles[minpos][0]+rectangles[minpos][2]
+    y1=rectangles[minpos][1]
+    y2=rectangles[minpos][1]+rectangles[minpos][3]
+    roi=frame[y1:y2,x1:x2]
+    custom_classifier.classify(roi)
+    
+def drop_point(point_history,points_history):
+    points_history.remove(point_history)
+    
+    
+#==============================================================================
+    
