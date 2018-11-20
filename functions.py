@@ -1,5 +1,5 @@
-#import classifiers.custom_classifier as classification
-import classifiers.mobileNetClassifier as classification
+import classifiers.custom_classifier as classification
+#import classifiers.mobileNetClassifier as classification
 import numpy as np
 
 
