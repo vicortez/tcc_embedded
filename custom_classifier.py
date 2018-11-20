@@ -1,12 +1,6 @@
-from keras.datasets import cifar100 # subroutines for fetching the CIFAR-10 dataset
-from keras.models import Model # basic class for specifying and training a neural network
-from keras.layers import Input, Convolution2D, MaxPooling2D, Dense, Dropout, Flatten
-from keras.utils import np_utils # utilities for one-hot encoding of ground truth values
 from keras.models import model_from_json
 
 import numpy as np
-import os
-from scipy import misc
 import matplotlib.pyplot as plt
 import cv2
 

@@ -38,13 +38,14 @@ ROI_CORNERS = np.array([[(800,360),(0,360), (0,720), (800,720)]], dtype=np.int32
 LINE_POINTS = [(400,0),(400,720)]
 ORIENTATION='horizontal'
 
-cap = cv2.VideoCapture(VID_DIRECTORY+'imd1.mov')
+cap = cv2.VideoCapture(VID_DIRECTORY+'imd3.mov')
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1280,720))
 fgbg = cv2.createBackgroundSubtractorMOG2()
 #detectShadows=False
 
 #benchmarking
-timeslist=[(0,0,"0")]
+timeslist=[]
+timelogs=[(0,0,"0")]
 
 framecount=0
 
@@ -58,7 +59,7 @@ while(1):
     ret, frame = cap.read()
     
     if frame is None:
-        1("none")
+        print("none")
         break
     
     framecount+=1
@@ -159,8 +160,8 @@ while(1):
     #==========================================================================
     
     # display images ==========================================================
-    cv2.imshow('blobs', contouringresult)
-    cv2.imshow('thing', framecopy)
+    #cv2.imshow('framecopy', framecopy)
+    #cv2.imshow('thing', image22)
     #==========================================================================
     
     #saving video

@@ -1,4 +1,5 @@
-import custom_classifier
+#import classifiers.custom_classifier as classification
+import classifiers.mobileNetClassifier as classification
 import numpy as np
 
 
@@ -23,15 +24,15 @@ def point_existed(p,points_history):
         return True
     
 def get_point_pos(p,points_history):
-    #se distancia entre ponto e algum dos elementos de lasthull.predict for menor que 10, True
+    # returns the position of the vehicle with the last location closest to the point location
     distlist=[]
     for el in points_history:
-        distlist.append(np.linalg.norm(np.subtract(p,el[len(el)-1])))
+        distlist.append(np.linalg.norm(np.subtract(p,el[-1])))
     minpos=distlist.index(min(distlist))
     return minpos
 
 def point_crossed_line(points_history,line,car_orientation):
-    if len(points_history) <= 1:
+    if len(points_history) < 1:
         return (False,(0,0),(0,0))
     up=False
     down=False
@@ -48,16 +49,14 @@ def point_crossed_line(points_history,line,car_orientation):
                     #points_history.remove(point_history)
                     return (True, point,point_history)
     elif car_orientation == 'horizontal':
-        print (line[0][0])
         for point_history in points_history:
             left=False
             right=False
             for point in point_history:
-                print(point)
-                if point[1] > line[0][1]:
-                    left=True
-                else:
+                if point[0] > line[0][0]:
                     right=True
+                else:
+                    left=True
                 if left and right:
                     #points_history.remove(point_history)
                     return (True, point,point_history)
@@ -76,7 +75,7 @@ def classify_point(point,rectangles,frame):
     y1=rectangles[minpos][1]
     y2=rectangles[minpos][1]+rectangles[minpos][3]
     roi=frame[y1:y2,x1:x2]
-    custom_classifier.classify(roi)
+    classification.classify(roi)
     
 def drop_point(point_history,points_history):
     points_history.remove(point_history)

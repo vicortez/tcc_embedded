@@ -21,7 +21,7 @@ import time
 VID_DIRECTORY = "C:\\Users\\victor\\Desktop\\tcc\\videos\\"
 #VID_DIRECTORY = ""
 
-#kernels ==================================================================
+#kernels ======================================================================
 KERNEL5=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 KERNEL7=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(7,7))
 KERNEL11=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(11,11))
@@ -29,15 +29,23 @@ KERNEL19=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(19,19))
 KERNEL23=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(23,23))
 KERNEL27=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(27,27))
 KERNEL29=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(29,29))
-#==========================================================================
+#==============================================================================
 
 #area of interest
 # points = x,y (l-r, t-b)
 #roi: top right, top left, bottom left, bottom right
-ROI_CORNERS = np.array([[(900,360),(20,360), (20,720), (900,720)]], dtype=np.int32)
-LINE_POINTS = [(100,600),(1000,600)]
-ORIENTATION='vertical'
-DEVELOP = True
+#ROI_CORNERS = np.array([[(900,360),(20,360), (20,720), (900,720)]], dtype=np.int32)
+ROI_CORNERS = np.array([[(800,360),(0,360), (0,720), (800,720)]], dtype=np.int32)
+
+#LINE_POINTS = [(100,600),(1000,600)]
+LINE_POINTS = [(400,0),(400,720)]
+CAR_FLOW_ORIENTATION='horizontal'
+
+FASTMODE = False
+DEBUG=False
+DISPLAY_VIDEO=True
+#==============================================================================
+
 
 cap = cv2.VideoCapture(VID_DIRECTORY+'imd3.mov')
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1280,720))
@@ -45,13 +53,13 @@ fgbg = cv2.createBackgroundSubtractorMOG2()
 #detectShadows=False
 
 #benchmarking
-timeslist=[(0,0,"0")]
+timeslist=[]
+timelogs=[(0,0,"0")]
 
 framecount=0
 
 #each element contains the history of each center detected
 points_history=[]
-
 #==============================================================================
 while(1):
     
@@ -63,11 +71,11 @@ while(1):
         print("none")
         break
     
+    framecount+=1
     framecopy=frame.copy()
 
-    framecount+=1
     
-    if(DEVELOP):
+    if(FASTMODE):
     
         #getting ROI ==========================================================
         # mask defaulting to black for 3-channel and transparent for 4-channel
@@ -80,13 +88,12 @@ while(1):
         roi = cv2.bitwise_and(frame, mask)
         #======================================================================
     else:
-        framecopy=framecopy[ROI_CORNERS[0][1][1]:ROI_CORNERS[0][2][1],ROI_CORNERS[0][1][0]:ROI_CORNERS[0][0][0]]
+        roi=framecopy[ROI_CORNERS[0][1][1]:ROI_CORNERS[0][2][1],ROI_CORNERS[0][1][0]:ROI_CORNERS[0][0][0]]
+        framecopy=roi
 
     
     # bluring =================================================================
-    if (DEVELOP):
-        mblur = cv2.medianBlur(roi,5)
-    else: mblur = cv2.medianBlur(framecopy,5)
+    mblur = cv2.medianBlur(roi,5)
     
     fgmaskmblur=fgbg.apply(mblur)
     
@@ -168,19 +175,28 @@ while(1):
                     
         else:
             points_history.append([p])
+            
+    # printing trails
+    if(DEBUG and len(points_history) >= 1):
+        for one_point_history in points_history:
+            for point in one_point_history:
+                cv2.circle(framecopy,point,7,(255,0,0),-1)
     
-    point_crossed,point,point_history=vic.point_crossed_line(points_history,LINE_POINTS,ORIENTATION)
+    # counting and classification
+    point_crossed,point,point_history=vic.point_crossed_line(points_history,LINE_POINTS,CAR_FLOW_ORIENTATION)
     if point_crossed:
         cv2.line(framecopy,LINE_POINTS[0],LINE_POINTS[1],(0,255,0),5)
-        vic.classify_point(point,rectangles,frame)
+        vic.classify_point(point,rectangles,roi)
         vic.drop_point(point_history,points_history)
     else:
         cv2.line(framecopy,LINE_POINTS[0],LINE_POINTS[1],(255,0,0),5)
+        
     #==========================================================================
     
     # display images ==========================================================
-    cv2.imshow('framecopy', framecopy)
-    cv2.imshow('thing', image22)
+    if(DISPLAY_VIDEO):
+        cv2.imshow('framecopy', framecopy)
+        cv2.imshow('thing', image22)
     #==========================================================================
     
     #saving video
