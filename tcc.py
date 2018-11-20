@@ -89,7 +89,8 @@ while(1):
         #======================================================================
     else:
         roi=framecopy[ROI_CORNERS[0][1][1]:ROI_CORNERS[0][2][1],ROI_CORNERS[0][1][0]:ROI_CORNERS[0][0][0]]
-        framecopy=roi
+        framecopy=roi.copy()
+        
 
     
     # bluring =================================================================
