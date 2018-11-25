@@ -6,4 +6,7 @@
 # videos
 *.mp4
 *.mov
-*.h5
+#*.h5
+images/*
+*.jpg
+*.png

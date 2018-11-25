@@ -1,0 +1,1 @@
+('this model has achieved an acurracy of ', 0.9818181839856235, ' with 5000 testing samples and ', 32, ' epochs')

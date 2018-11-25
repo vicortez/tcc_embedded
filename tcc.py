@@ -21,7 +21,7 @@ import time
 VID_DIRECTORY = "C:\\Users\\victor\\Desktop\\tcc\\videos\\"
 #VID_DIRECTORY = ""
 
-#kernels ======================================================================
+#kernels
 KERNEL5=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 KERNEL7=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(7,7))
 KERNEL11=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(11,11))
@@ -29,7 +29,6 @@ KERNEL19=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(19,19))
 KERNEL23=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(23,23))
 KERNEL27=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(27,27))
 KERNEL29=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(29,29))
-#==============================================================================
 
 #area of interest
 # points = x,y (l-r, t-b)
