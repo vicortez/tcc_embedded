@@ -130,8 +130,9 @@ while(1):
     #clearing small blobs
     for index, el in enumerate(hull):
         area = cv2.contourArea(el)
-        if area < 1500:
+        if area < 1500 or area > 50000:
             del hull[index]
+        
     
     blank=np.zeros(image22.copy().shape,np.uint8)
     #converting image back to 3 channels to display border colours
