@@ -212,6 +212,7 @@ while(1):
 
 cap.release()
 #out.release()
-cv2.destroyAllWindows()
+if(DISPLAY_VIDEO):
+    cv2.destroyAllWindows()
 
 mean = sum(timeslist)/len(timeslist)
