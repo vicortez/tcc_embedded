@@ -40,9 +40,13 @@ ROI_CORNERS = np.array([[(800,360),(0,360), (0,720), (800,720)]], dtype=np.int32
 LINE_POINTS = [(400,0),(400,720)]
 CAR_FLOW_ORIENTATION='horizontal'
 
-FASTMODE = False
+FASTMODE = True
 DEBUG=False
-DISPLAY_VIDEO=True
+DISPLAY_VIDEO=False
+EMBEDDED_MODE=True
+if EMBEDDED_MODE:
+    DISPLAY_VIDEO = False
+    FASTMODE=True
 #==============================================================================
 
 
@@ -74,7 +78,7 @@ while(1):
     framecopy=frame.copy()
 
     
-    if(FASTMODE):
+    if(not FASTMODE):
     
         #getting ROI ==========================================================
         # mask defaulting to black for 3-channel and transparent for 4-channel
@@ -186,7 +190,10 @@ while(1):
     point_crossed,point,point_history=vic.point_crossed_line(points_history,LINE_POINTS,CAR_FLOW_ORIENTATION)
     if point_crossed:
         cv2.line(framecopy,LINE_POINTS[0],LINE_POINTS[1],(0,255,0),5)
-        vic.send_to_server(point,rectangles,roi)
+        if EMBEDDED_MODE:
+            vic.send_to_server(point,rectangles,roi)
+        else:
+            vic.classify_point(point,rectangles,roi)
         vic.drop_point(point_history,points_history)
     else:
         cv2.line(framecopy,LINE_POINTS[0],LINE_POINTS[1],(255,0,0),5)

@@ -8,10 +8,6 @@ import datetime
 import json
 import os
 
-
-
-
-
 # functions ===================================================================
 def predict_next_position(pointpositionhistory):
     numofpos=len(pointpositionhistory)
