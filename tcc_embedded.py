@@ -40,17 +40,17 @@ ROI_CORNERS = np.array([[(800,360),(0,360), (0,720), (800,720)]], dtype=np.int32
 LINE_POINTS = [(400,0),(400,720)]
 CAR_FLOW_ORIENTATION='horizontal'
 
-FASTMODE = True
+FASTMODE = False
 DEBUG=False
-DISPLAY_VIDEO=False
-EMBEDDED_MODE=True
+DISPLAY_VIDEO=True
+EMBEDDED_MODE=False
 if EMBEDDED_MODE:
     DISPLAY_VIDEO = False
     FASTMODE=True
 #==============================================================================
 
 
-cap = cv2.VideoCapture(VID_DIRECTORY+'imd3.mov')
+cap = cv2.VideoCapture(VID_DIRECTORY+'imd1.mp4')
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1280,720))
 fgbg = cv2.createBackgroundSubtractorMOG2()
 #detectShadows=False
@@ -97,7 +97,7 @@ while(1):
 
     
     # bluring =================================================================
-    mblur = cv2.medianBlur(roi,5)
+    mblur = cv2.medianBlur(roi,3)
     
     fgmaskmblur=fgbg.apply(mblur)
     
@@ -134,7 +134,7 @@ while(1):
     #clearing small blobs
     for index, el in enumerate(hull):
         area = cv2.contourArea(el)
-        if area < 2500 or area > 200000:
+        if area < 9000 or area > 180000:
             del hull[index]
     
     blank=np.zeros(image22.copy().shape,np.uint8)
@@ -203,7 +203,8 @@ while(1):
     # display images ==========================================================
     if(DISPLAY_VIDEO):
         cv2.imshow('framecopy', framecopy)
-        cv2.imshow('thing', image22)
+        cv2.imshow('contour', image22)
+        cv2.imshow('hull', imagehull)
     #==========================================================================
     
     #saving video
