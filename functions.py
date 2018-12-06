@@ -23,7 +23,7 @@ def point_existed(p,points_history):
     for el in points_history:
         distlist.append(np.linalg.norm(np.subtract(p,el[len(el)-1])))
     minval=min(distlist)
-    if minval > 40:
+    if minval > 80:
         return False
     else:
         return True
@@ -37,8 +37,9 @@ def get_point_pos(p,points_history):
     return minpos
 
 def point_crossed_line(points_history,line,car_orientation):
+    direction = ''
     if len(points_history) < 1:
-        return (False,(0,0),(0,0))
+        return (False,(0,0),(0,0),'no detection')
     up=False
     down=False
     if car_orientation == 'vertical':
@@ -52,7 +53,7 @@ def point_crossed_line(points_history,line,car_orientation):
                     down=True
                 if up and down:
                     #points_history.remove(point_history)
-                    return (True, point,point_history)
+                    return (True, point,point_history,direction)
     elif car_orientation == 'horizontal':
         for point_history in points_history:
             left=False
@@ -64,11 +65,32 @@ def point_crossed_line(points_history,line,car_orientation):
                     left=True
                 if left and right:
                     #points_history.remove(point_history)
-                    return (True, point,point_history)
-    return (False,(0,0),(0,0))
+                    return (True, point,point_history,direction)
+    return (False,(0,0),(0,0),'')
 
-def classify_point(point,rectangles,frame):
-    print( len(rectangles))
+def point_crossed_line2(points_history,line,car_orientation):
+    if len(points_history) < 1:
+        return (False,(0,0),(0,0),'no detection')
+    if car_orientation == 'vertical':
+        for point_history in points_history:
+            if len(point_history) <= 1:
+                return (False,(0,0),(0,0),'no detection')
+            if point_history[-1][1] > line[0][1] and point_history[-2][1] < line[0][1]:
+                return (True, point_history[-1],point_history,'down')
+    elif car_orientation == 'horizontal':
+        for point_history in points_history:
+            if len(point_history) <= 1:
+                continue
+            elif point_history[-1][0] > line[0][0] and point_history[-2][0] < line[0][0]:
+                return (True, point_history[-1],point_history,'l-r')
+            elif point_history[-1][0] < line[0][0] and point_history[-2][0] > line[0][0]:
+                return (True, point_history[-1],point_history,'r-l')
+                
+    return (False,(0,0),(0,0),'no detection')
+
+def classify_point(point,rectangles,frame,direction):
+    print(len(rectangles))
+    print(direction)
     distlist=[];
     for rect in rectangles:
         xret=rect[0]+rect[2]/2
@@ -82,7 +104,7 @@ def classify_point(point,rectangles,frame):
     roi=frame[y1:y2,x1:x2]
     classification.classify(roi)
     
-def send_to_server(point,rectangles,frame):
+def send_to_server(point,rectangles,frame,direction):
     distlist=[];
     for rect in rectangles:
         xret=rect[0]+rect[2]/2
@@ -100,7 +122,7 @@ def send_to_server(point,rectangles,frame):
     cv2.imwrite(filename, roi)
     params = {'sensor_id': 1,
               'time_stamp': timestamp.strftime('%Y-%m-%d_%H-%M-%S-%f'),
-              'direction': 'l-r'}
+              'direction': direction}
     headers = {"Api-Key": "dead-beef-4-feed", "Accept": "*/*"}
     files = {
         'json': (None, json.dumps(params), 'application/json'),

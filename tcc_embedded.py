@@ -40,17 +40,17 @@ ROI_CORNERS = np.array([[(800,360),(0,360), (0,720), (800,720)]], dtype=np.int32
 LINE_POINTS = [(400,0),(400,720)]
 CAR_FLOW_ORIENTATION='horizontal'
 
-FASTMODE = False
+FASTMODE = True
 DEBUG=False
 DISPLAY_VIDEO=True
-EMBEDDED_MODE=False
+EMBEDDED_MODE=True
 if EMBEDDED_MODE:
     DISPLAY_VIDEO = False
     FASTMODE=True
 #==============================================================================
 
 
-cap = cv2.VideoCapture(VID_DIRECTORY+'imd1.mp4')
+cap = cv2.VideoCapture(VID_DIRECTORY+'imd4.mp4')
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1280,720))
 fgbg = cv2.createBackgroundSubtractorMOG2()
 #detectShadows=False
@@ -97,7 +97,7 @@ while(1):
 
     
     # bluring =================================================================
-    mblur = cv2.medianBlur(roi,3)
+    mblur = cv2.medianBlur(roi,5)
     
     fgmaskmblur=fgbg.apply(mblur)
     
@@ -115,14 +115,17 @@ while(1):
     #filling blobs ============================================================
     
     #mblur
-    h, w = morphresult.shape[:2]
+    #h, w = morphresult.shape[:2]
+    #mask = np.zeros((h+2, w+2), np.uint8)
+    #im_floodfill=morphresult.copy()
+    im_floodfill=cv2.copyMakeBorder(morphresult, top=1, bottom=1, left=1, right=1, borderType= cv2.BORDER_CONSTANT, value=0 )
+    h, w = im_floodfill.shape[:2]
     mask = np.zeros((h+2, w+2), np.uint8)
-    im_floodfill=morphresult.copy()
     cv2.floodFill(im_floodfill, mask, (0,0), 255);
     # Invert floodfilled image
     im_floodfill_inv = cv2.bitwise_not(im_floodfill)
     # Combine the two images to get the foreground.
-    filledimg = morphresult | im_floodfill_inv
+    filledimg = morphresult | im_floodfill_inv[1:-1,1:-1]
     
     fillingresult = filledimg
     #==========================================================================
@@ -187,13 +190,13 @@ while(1):
                 cv2.circle(framecopy,point,7,(255,0,0),-1)
     
     # counting and classification
-    point_crossed,point,point_history=vic.point_crossed_line(points_history,LINE_POINTS,CAR_FLOW_ORIENTATION)
+    point_crossed,point,point_history,direction=vic.point_crossed_line2(points_history,LINE_POINTS,CAR_FLOW_ORIENTATION)
     if point_crossed:
         cv2.line(framecopy,LINE_POINTS[0],LINE_POINTS[1],(0,255,0),5)
         if EMBEDDED_MODE:
-            vic.send_to_server(point,rectangles,roi)
+            vic.send_to_server(point,rectangles,roi,direction)
         else:
-            vic.classify_point(point,rectangles,roi)
+            vic.classify_point(point,rectangles,roi,direction)
         vic.drop_point(point_history,points_history)
     else:
         cv2.line(framecopy,LINE_POINTS[0],LINE_POINTS[1],(255,0,0),5)
@@ -203,8 +206,10 @@ while(1):
     # display images ==========================================================
     if(DISPLAY_VIDEO):
         cv2.imshow('framecopy', framecopy)
-        cv2.imshow('contour', image22)
         cv2.imshow('hull', imagehull)
+        cv2.imshow('contours', image22)
+        
+
     #==========================================================================
     
     #saving video

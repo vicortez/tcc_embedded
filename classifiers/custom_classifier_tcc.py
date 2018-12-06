@@ -10,7 +10,6 @@ def classify(img):
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     plt.imshow(np.uint8(img_rgb))
     plt.show()
-    print(img.shape)
     img_rgb /= 255
     # Convert the image / images into batch format
     # expand_dims will add an extra dimension to the data at a particular axis
