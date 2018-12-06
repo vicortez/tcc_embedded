@@ -50,7 +50,7 @@ if EMBEDDED_MODE:
 #==============================================================================
 
 
-cap = cv2.VideoCapture(VID_DIRECTORY+'imd4.mp4')
+cap = cv2.VideoCapture(VID_DIRECTORY+'imd3.mov')
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1280,720))
 fgbg = cv2.createBackgroundSubtractorMOG2()
 #detectShadows=False
