@@ -42,7 +42,7 @@ CAR_FLOW_ORIENTATION='horizontal'
 
 FASTMODE = True
 DEBUG=False
-DISPLAY_VIDEO=True
+DISPLAY_VIDEO=False
 EMBEDDED_MODE=True
 if EMBEDDED_MODE:
     DISPLAY_VIDEO = False
@@ -163,7 +163,7 @@ while(1):
     #==========================================================================
     
     
-    # counting ================================================================
+    # tracking ================================================================
     #para cada contorno, checar se ele ja existia no frame anterior. se nao,
     #aloca-lo na lista, se sim, adicionar a um historico de pontos existente.
     
@@ -206,8 +206,15 @@ while(1):
     # display images ==========================================================
     if(DISPLAY_VIDEO):
         cv2.imshow('framecopy', framecopy)
-        cv2.imshow('hull', imagehull)
+        cv2.imshow('blur', mblur)
+        cv2.imshow('foreground', fgmaskmblur)
+        cv2.imshow('opening', openingmblur)
+        cv2.imshow('dilation', dilationmblur)
+        cv2.imshow('fillingresult', fillingresult)
         cv2.imshow('contours', image22)
+        cv2.imshow('hull', imagehull)
+        cv2.imshow('R', roi)
+        
         
 
     #==========================================================================
